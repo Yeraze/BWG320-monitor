@@ -43,7 +43,18 @@ def main(argv):
     p = re.compile('<table class="table100" cellpadding="1" summary="LAN Ethernet Statistics Table">(.+?)</table>', re.DOTALL)
     tblContents = p.search(pageContent).group(1)
 
-    print(tblContents)
+    p = re.compile('Transmit Bytes</td>(.+?)</tr>', re.DOTALL)
+    tranBlock = p.search(tblContents).group(1)
+
+    p = re.compile('Receive Bytes</td>(.+?)</tr>', re.DOTALL)
+    recvBlock = p.search(tblContents).group(1)
+
+    p = re.compile('<td class="col2">(\d+)</td>', re.MULTILINE)
+    tranBytes = p.findall(tranBlock)
+    recvBytes = p.findall(recvBlock)
+
+    # At this point both 'tranBytes' and 'recvBytes' should be a 4-element list containing the 
+    # number of bytes transmitted/received ...
 
 
 if __name__ == "__main__":
