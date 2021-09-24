@@ -102,11 +102,17 @@ def main(argv):
         if (ptranBytes > tranBytes):
             # This is the case where the modem reset our numbers
             tranDelta = tranBytes
-            recvDelta = recvBytes
         else:
             # This is our "normal" case.. CAlculcate the diff's
             tranDelta = tranBytes - ptranBytes
+
+        # You may be asked "Why do this twice?"
+        # Seems teh modem automatically resets the numbers at the 4gig mark , but manages
+        # each of them separately...  So in that case, Trans would reset but recv wouldn't.
+        if (precvBytes > recvBytes):
             recvDelta = recvBytes - precvBytes
+        else:
+            recvDelta = recvBytes
 
     # Now insert into the DB
     c.execute("INSERT INTO data(speed, totalsent, deltasent, totalrecv, deltarecv) values(?,?,?,?,?)",
