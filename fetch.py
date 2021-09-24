@@ -110,9 +110,9 @@ def main(argv):
         # Seems teh modem automatically resets the numbers at the 4gig mark , but manages
         # each of them separately...  So in that case, Trans would reset but recv wouldn't.
         if (precvBytes > recvBytes):
-            recvDelta = recvBytes - precvBytes
-        else:
             recvDelta = recvBytes
+        else:
+            recvDelta = recvBytes - precvBytes
 
     # Now insert into the DB
     c.execute("INSERT INTO data(speed, totalsent, deltasent, totalrecv, deltarecv) values(?,?,?,?,?)",
