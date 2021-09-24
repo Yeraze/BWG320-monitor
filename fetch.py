@@ -85,6 +85,7 @@ def main(argv):
     #     This will avoid giant spikes when we start trying to calculate daily or hourly numbers 
     #  2: The previous record's total is more than the current total.. This is the "modem rebooted" state.
     #     In this state, we'll use the Total _as_ the delta, since it should be pretty small
+    #     Yes, our results won't be 100% Accurate but we can't recover those "missing" byte numbers
     
     # So first, retrieve teh most recent record.
 
