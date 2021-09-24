@@ -7,9 +7,8 @@ import sys, getopt
 
 def usage():
     print("fetch.py [-c <configFile>]")
-
     print("   configFile - Defalts to rvwhisper.ini")
-   
+
 def fetchPage(url):
     # Fetch the given URL and return it as a string
     # Basically put here as a function for easy automatic cleanup
@@ -22,6 +21,7 @@ def fetchPage(url):
 
 def main(argv):
     configFile = 'bgw320.ini'
+
     try:
         opts, args = getopt.getopt(argv, "c", ["config="])
     except getopt.GetoptError as err:
@@ -43,23 +43,20 @@ def main(argv):
 
     p = re.compile('<table class="table100" cellpadding="1" summary="LAN Ethernet Statistics Table">(.+?)</table>', re.DOTALL)
     tblContents = p.search(pageContent).group(1)
-
     p = re.compile('Transmit Speed</td>(.+?)</tr>', re.DOTALL)
     speedBlock = p.search(tblContents).group(1)
-
     p = re.compile('Transmit Bytes</td>(.+?)</tr>', re.DOTALL)
     tranBlock = p.search(tblContents).group(1)
-
     p = re.compile('Receive Bytes</td>(.+?)</tr>', re.DOTALL)
     recvBlock = p.search(tblContents).group(1)
 
+    # Each of these has 4 results, separated by physical port on the modem
+    # I don't care about the individuals, so just get the numbers and sum them up
     p = re.compile('<td class="col2">(\d+)</td>', re.MULTILINE)
     speedBytes = sum(map(lambda x : int(x), p.findall(speedBlock)))
     print("Speed:  %s" % speedBytes)
-
     tranBytes = sum(map(lambda x : int(x), p.findall(tranBlock)))
     print("Transmit Bytes:  %s" % tranBytes)
-
     recvBytes = sum(map(lambda x : int(x), p.findall(recvBlock)))
     print("Receive Bytes:  %s" % recvBytes)
 
@@ -79,13 +76,44 @@ def main(argv):
                     totalsent integer,
                     deltasent integer,
                     totalrecv integer,
-                    deltarecv integer
-                    bytesreceived integer);""")
+                    deltarecv integer);""")
 
+    # Now we need to calculate the Delta bytes sent/recv from the most recent total
+    # There are 2 failure cases to handle
+    #  1: There is no previous record.. This is the initialization state for a fresh DB
+    #     In this we'll write the current Totals, and put in 0's for the delta
+    #     This will avoid giant spikes when we start trying to calculate daily or hourly numbers 
+    #  2: The previous record's total is more than the current total.. This is the "modem rebooted" state.
+    #     In this state, we'll use the Total _as_ the delta, since it should be pretty small
+    
+    # So first, retrieve teh most recent record.
 
+    c.execute("""select totalsent, totalrecv from data order by Timestamp desc limit 1""")
+    previousTotals = c.fetchall()
 
+    if(len(previousTotals) == 0):
+        # This is the initialization state, nothing here to write.
+        tranDelta = 0
+        recvDelta = 0
+    else:
+        (ptranBytes, precvBytes) = map(lambda x: int(x), previousTotals[0])
+ 
+        if (ptranBytes > tranBytes):
+            # This is the case where the modem reset our numbers
+            tranDelta = tranBytes
+            recvDelta = recvBytes
+        else:
+            # This is our "normal" case.. CAlculcate the diff's
+            tranDelta = tranBytes - ptranBytes
+            recvDelta = recvBytes - precvBytes
 
+    # Now insert into the DB
+    c.execute("INSERT INTO data(speed, totalsent, deltasent, totalrecv, deltarecv) values(?,?,?,?,?)",
+                (speedBytes, tranBytes, tranDelta, recvBytes, recvDelta))
 
+    # And we're done!
+    db.commit()
+    db.close()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
