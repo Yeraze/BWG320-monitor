@@ -26,7 +26,7 @@ def MakeChart(titles, dataTitles, data):
     dataSets = list()
     # Skip element 0 because that's the x-Axis
     for element in range(1, len(data[0])):
-        d = """{ type: 'line',
+        d = """{ type: 'bar',
                   label: '%s', 
                   showLine: true,
                   cubicInterpolationMode: 'default',
@@ -46,7 +46,7 @@ def MakeChart(titles, dataTitles, data):
 
     chart += """ ] };
     const config = {
-        type: "line",
+        type: "bar",
         data: chartData,
         options: {
             parsing: false,
