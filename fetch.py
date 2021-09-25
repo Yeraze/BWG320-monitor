@@ -79,13 +79,16 @@ def main(argv):
                     deltarecv integer);""")
 
     # Now we need to calculate the Delta bytes sent/recv from the most recent total
-    # There are 2 failure cases to handle
+    # There are 3 failure cases to handle
     #  1: There is no previous record.. This is the initialization state for a fresh DB
     #     In this we'll write the current Totals, and put in 0's for the delta
     #     This will avoid giant spikes when we start trying to calculate daily or hourly numbers 
-    #  2: The previous record's total is more than the current total.. This is the "modem rebooted" state.
+    #  2: The previous record's total is more than the current total.. This is the "modem rebooted" state
     #     In this state, we'll use the Total _as_ the delta, since it should be pretty small
     #     Yes, our results won't be 100% Accurate but we can't recover those "missing" byte numbers
+    #  3: This looks just like #2, except it's due to Integer overflow.
+    #     Whenever the bytes transferred rolls over 2^32 (4gig), it resets to 0.  We _can_ recover
+    #     This number by acknowledging the rollover, but detecting it via #2 above is hard.
     
     # So first, retrieve teh most recent record.
 
@@ -101,7 +104,11 @@ def main(argv):
  
         if (ptranBytes > tranBytes):
             # This is the case where the modem reset our numbers
-            tranDelta = tranBytes
+            # This could be due to a reboot, or an overflow.. The numbers overflow at 2^32 (4 gig)
+            if (ptranBytes > 3500000000):  # Honestly not sure if this is the best way to detect this
+                tranDelta = tranBytes + (2**32 - ptranBytes)
+            else:
+                tranDelta = tranBytes
         else:
             # This is our "normal" case.. CAlculcate the diff's
             tranDelta = tranBytes - ptranBytes
@@ -110,7 +117,10 @@ def main(argv):
         # Seems teh modem automatically resets the numbers at the 4gig mark , but manages
         # each of them separately...  So in that case, Trans would reset but recv wouldn't.
         if (precvBytes > recvBytes):
-            recvDelta = recvBytes
+            if (precvBytes > 3500000000):
+                recvDelta = recvBytes + (2**32 - precvBytes)
+            else :
+                recvDelta = recvBytes
         else:
             recvDelta = recvBytes - precvBytes
 
