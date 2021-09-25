@@ -10,19 +10,20 @@ def MakeChart(titles, dataTitles, data):
     color = ("blue", "red")
 
     chart = ""  
-    chart += """<html>
-    <head>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0"></script>
-        <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.1.1"></script>
-        <title>%s</title>
-    </head>
-    <body>
+#    chart += """<html>
+#    <head>
+#        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0"></script>
+#        <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+#        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.1.1"></script>
+#        <title>%s</title>
+#    </head>
+#    <body>"""
+    chart += """
         <canvas id="myChart"></canvas>
     <script>
     chartData = {
         datasets: [
-    """ % titles
+    """ 
     dataSets = list()
     # Skip element 0 because that's the x-Axis
     for element in range(1, len(data[0])):
@@ -54,28 +55,16 @@ def MakeChart(titles, dataTitles, data):
                     mode: 'x',
                     axis: 'x',
                     intersect: false
-            },
-        plugins: {
-            zoom: {
-                pan: {
-                    enabled: true,
-                    mode: 'xy'
-                },
-                zoom: {
-                    wheel: {
-                        enabled: true
-                    }
-                }
             }
-        } 
     } };
     var myChart = new Chart(
         document.getElementById('myChart'),
         config
     );
-    </script>
-    </body>
-    </html>"""
+    </script>"""
+#    chart += """
+#    </body>
+#    </html>"""
 
     return chart
 

@@ -66,7 +66,7 @@ def main(argv):
     # Now open/init the database.
     # Normally you would wrap this in a try/except block to catch any error..
     # But honestly, if we have an error here then the script should just exit with the error ...
-    db = sqlite3.connect("bwg320.db")
+    db = sqlite3.connect("bgw320.db")
 
     # Make sure the table we need exists.
     c = db.cursor()
