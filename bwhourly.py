@@ -3,7 +3,6 @@ import sqlite3
 import sys
 import bgwChartGen
 
-
 def usage():
     print("hourly.py <database> <output html>")
 
@@ -20,7 +19,14 @@ def main(argv):
     try:
         conn = sqlite3.connect(database)
         c = conn.cursor()
-        c.execute("select strftime('%Y-%m-%d %H', datetime(Timestamp, 'localtime')) Hour, sum(deltarecv), sum(deltasent) from data group by hour order by hour desc limit 48")
+        c.execute("""select strftime('%Y-%m-%d %H', datetime(Timestamp, 'localtime')) hour, 
+                        min(bw), max(bw), avg(bw) from (
+                            select timestamp, deltasent, 
+                                (deltasent * 8) / ((julianday(Timestamp) - julianday(lag(Timestamp, 1, 0) over ( order by Timestamp))) * 86400) bw 
+                                from data) 
+                        group by hour
+                        order by hour desc limit 48""")
+
         rows = c.fetchall()
         conn.close()
 
@@ -39,7 +45,7 @@ def main(argv):
     # This is because the data collected is backwards.. Kinda.
     #  "Bytes Sent" is "Sent to the LAN port", not sent Upstream.  So that's actually data Downloaded from the network
     with open(outfile, 'w') as f:
-        f.write(bgwChartGen.MakeChart("Hourly Total Bandwidth Consumed", ("Bytes Upload", "Bytes Download"), rows))
+        f.write(bgwChartGen.MakeBWChart("Bandwidth Consumed", ("Min/Max BW", "Average BW"), rows))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
