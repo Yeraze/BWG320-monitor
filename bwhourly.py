@@ -22,7 +22,7 @@ def main(argv):
         c.execute("""select strftime('%Y-%m-%d %H', datetime(Timestamp, 'localtime')) hour, 
                         min(bw), max(bw), avg(bw) from (
                             select timestamp,
-                                (deltasent * 8) / ((julianday(Timestamp) - julianday(lag(Timestamp, 1, 0) over ( order by Timestamp))) * 86400) bw 
+                                (deltasent * 8 / 1000000) / ((julianday(Timestamp) - julianday(lag(Timestamp, 1, 0) over ( order by Timestamp))) * 86400) bw 
                                 from data) 
                         group by hour
                         order by hour desc limit 48""")
@@ -45,7 +45,7 @@ def main(argv):
     # This is because the data collected is backwards.. Kinda.
     #  "Bytes Sent" is "Sent to the LAN port", not sent Upstream.  So that's actually data Downloaded from the network
     with open(outfile, 'w') as f:
-        f.write(bgwChartGen.MakeBWChart("Bandwidth Consumed", ("Min/Max BW", "Average BW"), rows))
+        f.write(bgwChartGen.MakeBWChart("Bandwidth Consumed (Mbps)", ("Min/Max BW (Mbps)", "Average BW (Mbps)"), rows))
 
 if __name__ == "__main__":
     main(sys.argv[1:])

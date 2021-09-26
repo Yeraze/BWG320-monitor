@@ -95,7 +95,7 @@ def MakeBWChart(titles, dataTitles, data):
               label: '%s', 
               data: [""" % dataTitles[0]
 
-    dataElements = map(lambda x : "[%s, %s]" % (int(x[1]), int(x[2])), data)
+    dataElements = map(lambda x : "[%s, %s]" % (round(x[1],3), round(x[2],3)), data)
     d += ','.join(dataElements)
     d += "]}"
     dataSets.append(d)
@@ -105,7 +105,7 @@ def MakeBWChart(titles, dataTitles, data):
               yAxisID: 'SLOPE',
               label: '%s',
               data:[""" %dataTitles[1]
-    dataElements = map(lambda x : "%s" % int(x[3]), data)
+    dataElements = map(lambda x : "%s" % (round(x[3],3)), data)
     d += ','.join(dataElements)
     d += "]}"
     dataSets.append(d)
