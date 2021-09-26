@@ -21,7 +21,7 @@ def main(argv):
         c = conn.cursor()
         c.execute("""select strftime('%Y-%m-%d %H', datetime(Timestamp, 'localtime')) hour, 
                         min(bw), max(bw), avg(bw) from (
-                            select timestamp, deltasent, 
+                            select timestamp,
                                 (deltasent * 8) / ((julianday(Timestamp) - julianday(lag(Timestamp, 1, 0) over ( order by Timestamp))) * 86400) bw 
                                 from data) 
                         group by hour
