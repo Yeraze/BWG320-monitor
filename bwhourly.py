@@ -19,11 +19,15 @@ def main(argv):
     try:
         conn = sqlite3.connect(database)
         c = conn.cursor()
-        c.execute("""select strftime('%Y-%m-%d %H', datetime(Timestamp, 'localtime')) hour, 
-                        min(bw), max(bw), avg(bw) from (
+        c.execute("""select strftime('%Y-%m-%d %H:00', datetime(Timestamp, 'localtime')) hour, 
+                        min(bw1), max(bw1), avg(bw1),
+                        min(bw2), max(bw2), avg(bw2)
+                        from (
                             select timestamp,
-                                (deltasent * 8 / 1000000) / ((julianday(Timestamp) - julianday(lag(Timestamp, 1, 0) over ( order by Timestamp))) * 86400) bw 
-                                from data) 
+                                (deltasent * 8 / 1000000) / ((julianday(Timestamp) - julianday(lag(Timestamp, 1, 0) over ( order by Timestamp))) * 86400) bw1,
+                                (deltarecv * 8 / 1000000) / ((julianday(Timestamp) - julianday(lag(Timestamp, 1, 0) over ( order by Timestamp))) * 86400) bw2 
+                                from data
+                        ) 
                         group by hour
                         order by hour desc limit 48""")
 
@@ -38,14 +42,12 @@ def main(argv):
     rows.reverse()
 
     # Now we have a nice trivial chart to generate... 
-    # 'rows' should contain a list of simple 3-element tuples (Timestamp, Bytes Received, Bytes Sent)
+    # 'rows' should contain a list of simple 4-element tuples (Timestamp, Min bandwidth, Max bandwidth received, average bandwidth)
     # Now, I plan to generate a few of these.. Hourly and Daily bandwidth.. maybe even Monthly.
 
-    # Now, the astute among you may notice that I've got the UPload/Download titles backwards.
-    # This is because the data collected is backwards.. Kinda.
-    #  "Bytes Sent" is "Sent to the LAN port", not sent Upstream.  So that's actually data Downloaded from the network
+    # Send them to the function to render the 3 datapoints as a Bar from Min to Max, and a line through the Averages
     with open(outfile, 'w') as f:
-        f.write(bgwChartGen.MakeBWChart("Bandwidth Consumed (Mbps)", ("Min/Max BW (Mbps)", "Average BW (Mbps)"), rows))
+        f.write(bgwChartGen.MakeBWChart("Bandwidth Consumed (Mbps)", ("Download Min/Max BW (Mbps)", "Download Average BW (Mbps)", "Upload Min/Max BW (Mbps)", "Upload Average BW (Mbps)"), rows))
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -71,6 +71,7 @@ def MakeChart(titles, dataTitles, data):
     return chart
 
 def MakeBWChart(titles, dataTitles, data):
+    color = ("rgba(255,0,0,0.5)", "orange", "rgba(0,0,255,0.5)" , "purple")
     chart = ""  
     chart += """
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0"></script>
@@ -89,26 +90,35 @@ def MakeBWChart(titles, dataTitles, data):
         datasets: [
     """ 
     dataSets = list()
-    # Skip element 0 because that's the x-Axis
-    d = """{ type: 'bar',
-              yAxisID: 'SLOPE',
-              label: '%s', 
-              data: [""" % dataTitles[0]
+    for N in range(0, int((len(data[0]) - 1) / 3)):
+        element = (N *3) +1
+        
+        # Skip element 0 because that's the x-Axis
+        d = """{ type: 'bar',
+                  yAxisID: 'SLOPE',
+                  label: '%s', 
+                  data: [""" % dataTitles[2*N]
 
-    dataElements = map(lambda x : "[%s, %s]" % (round(x[1],3), round(x[2],3)), data)
-    d += ','.join(dataElements)
-    d += "]}"
-    dataSets.append(d)
-
-    d = """ 
-            { type: 'line',
-              yAxisID: 'SLOPE',
-              label: '%s',
-              data:[""" %dataTitles[1]
-    dataElements = map(lambda x : "%s" % (round(x[3],3)), data)
-    d += ','.join(dataElements)
-    d += "]}"
-    dataSets.append(d)
+        dataElements = map(lambda x : "[%s, %s]" % (round(x[element],3), round(x[element+1],3)), data)
+        d += ','.join(dataElements)
+        d += """],
+                  borderColor: '%s',
+                  backgroundColor: '%s'
+                }""" % (color[2*N], color[2*N])
+        dataSets.append(d)
+ 
+        d = """ 
+                { type: 'line',
+                  yAxisID: 'SLOPE',
+                  label: '%s',
+                  data:[""" %dataTitles[2*N +1]
+        dataElements = map(lambda x : "%s" % (round(x[element +2],3)), data)
+        d += ','.join(dataElements)
+        d += """],
+                  borderColor: '%s',
+                  backgroundColor: '%s'
+                }""" % (color[2*N+1], color[2*N+1])
+        dataSets.append(d)
 
     chart += ','.join(dataSets)
 
