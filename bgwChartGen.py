@@ -5,7 +5,7 @@
 #   Each tuple should contain as element 0 the main axis (Timestamp usually)
 #        All other elements should contain the values to graph
 #  Result is a massive string returned that can be dumped to a file
-def MakeChart(titles, dataTitles, data):
+def MakeChart(name, titles, dataTitles, data):
     color = ("red", "blue", "purple")
 
     chart = ""  
@@ -21,11 +21,11 @@ def MakeChart(titles, dataTitles, data):
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0"></script>
         <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.1.1"></script>
-        <canvas id="myChart"></canvas>
+        <canvas id="%s"></canvas>
     <script>
-    chartData = {
+    %s_chartData = {
         datasets: [
-    """ 
+    """  % (name, name)
     dataSets = list()
     # Skip element 0 because that's the x-Axis
     for element in range(1, len(data[0])):
@@ -48,9 +48,9 @@ def MakeChart(titles, dataTitles, data):
     chart += ','.join(dataSets)
 
     chart += """ ] };
-    const config = {
+    const %s_config = {
         type: "bar",
-        data: chartData,
+        data: %s_chartData,
         options: {
             parsing: false,
             interaction: {
@@ -59,28 +59,28 @@ def MakeChart(titles, dataTitles, data):
                     intersect: false
             }
     } };
-    var myChart = new Chart(
-        document.getElementById('myChart'),
-        config
+    var %s = new Chart(
+        document.getElementById('%s'),
+        %s_config
     );
-    </script>"""
+    </script>""" % (name, name, name, name, name)
 #    chart += """
 #    </body>
 #    </html>"""
 
     return chart
 
-def MakeBWChart(titles, dataTitles, data):
+def MakeBWChart(name, titles, dataTitles, data):
     color = ("rgba(255,0,0,0.5)", "orange", "rgba(0,0,255,0.5)" , "purple")
     chart = ""  
     chart += """
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0"></script>
         <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.1.1"></script>
-        <canvas id="myChart"></canvas>
+        <canvas id="%s"></canvas>
     <script>
-    chartData = {
-        labels: ["""
+    %s_chartData = {
+        labels: [""" % (name, name)
 
     dataElements = map(lambda x : "'%s'" % x[0], data)
     chart += ','.join(dataElements)
@@ -123,9 +123,9 @@ def MakeBWChart(titles, dataTitles, data):
     chart += ','.join(dataSets)
 
     chart += """ ] };
-    const config = {
+    const %s_config = {
         type: "bar",
-        data: chartData,
+        data: %s_chartData,
         options: {
             scales: {
                 'SLOPE': {
@@ -135,11 +135,11 @@ def MakeBWChart(titles, dataTitles, data):
             }
         }
     };
-    var myChart = new Chart(
-        document.getElementById('myChart'),
-        config
+    var %s_myChart = new Chart(
+        document.getElementById('%s'),
+        %s_config
     );
-    </script>"""
+    </script>""" % (name, name, name, name, name)
 #    chart += """
 #    </body>
 #    </html>"""

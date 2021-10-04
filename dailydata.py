@@ -39,7 +39,7 @@ def main(argv):
     # This is because the data collected is backwards.. Kinda.
     #  "Bytes Sent" is "Sent to the LAN port", not sent Upstream.  So that's actually data Downloaded from the network
     with open(outfile, 'w') as f:
-        f.write(bgwChartGen.MakeChart("Daily Data Consumption", ("MBytes Upload", "MBytes Download"), rows))
+        f.write(bgwChartGen.MakeChart("dailydata", "Daily Data Consumption", ("MBytes Upload", "MBytes Download"), rows))
 
 if __name__ == "__main__":
     main(sys.argv[1:])

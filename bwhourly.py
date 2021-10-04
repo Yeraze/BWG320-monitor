@@ -47,7 +47,7 @@ def main(argv):
 
     # Send them to the function to render the 3 datapoints as a Bar from Min to Max, and a line through the Averages
     with open(outfile, 'w') as f:
-        f.write(bgwChartGen.MakeBWChart("Bandwidth Consumed (Mbps)", ("Download Min/Max BW (Mbps)", "Download Average BW (Mbps)", "Upload Min/Max BW (Mbps)", "Upload Average BW (Mbps)"), rows))
+        f.write(bgwChartGen.MakeBWChart("bwchart", "Bandwidth Consumed (Mbps)", ("Download Min/Max BW (Mbps)", "Download Average BW (Mbps)", "Upload Min/Max BW (Mbps)", "Upload Average BW (Mbps)"), rows))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
