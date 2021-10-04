@@ -71,7 +71,7 @@ def MakeChart(name, titles, dataTitles, data):
     return chart
 
 def MakeBWChart(name, titles, dataTitles, data):
-    color = ("rgba(255,0,0,0.5)", "orange", "rgba(0,0,255,0.5)" , "purple")
+    color = ("rgba(0,0,255,0.5)" , "purple","rgba(255,0,0,0.5)", "orange")
     chart = ""  
     chart += """
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0"></script>
