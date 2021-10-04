@@ -29,7 +29,7 @@ def main(argv):
                                 from data
                         ) 
                         group by hour
-                        order by hour desc limit 48""")
+                        order by hour desc limit 24""")
 
         rows = c.fetchall()
         conn.close()
