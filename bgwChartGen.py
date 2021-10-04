@@ -127,13 +127,14 @@ def MakeBWChart(titles, dataTitles, data):
         type: "bar",
         data: chartData,
         options: {
-        scales: {
-            'SLOPE': {
-                position: 'left',
-                beginAtZero: false
+            scales: {
+                'SLOPE': {
+                    position: 'left',
+                    beginAtZero: false
+                }
             }
         }
-    } };
+    };
     var myChart = new Chart(
         document.getElementById('myChart'),
         config
