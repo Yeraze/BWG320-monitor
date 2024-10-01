@@ -20,7 +20,7 @@ def main(argv):
     try:
         conn = sqlite3.connect(database)
         c = conn.cursor()
-        c.execute("select strftime('%Y-%m-%d %H', datetime(Timestamp, 'localtime')) Hour, sum(deltarecv), sum(deltasent) from data group by hour order by hour desc limit 48")
+        c.execute("select strftime('%Y-%m-%d %H', datetime(Timestamp, 'localtime')) Hour, sum(deltarecv) / 1000000, sum(deltasent) / 1000000 from data group by hour order by hour desc limit 48")
         rows = c.fetchall()
         conn.close()
 
@@ -39,7 +39,7 @@ def main(argv):
     # This is because the data collected is backwards.. Kinda.
     #  "Bytes Sent" is "Sent to the LAN port", not sent Upstream.  So that's actually data Downloaded from the network
     with open(outfile, 'w') as f:
-        f.write(bgwChartGen.MakeChart("hourly", "Hourly Total Bandwidth Consumed", ("Bytes Upload", "Bytes Download"), rows))
+        f.write(bgwChartGen.MakeChart("hourly", "Hourly Total Bandwidth Consumed", ("MB Upload", "MB Download"), rows))
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -50,6 +50,24 @@ def main(argv):
     p = re.compile('Receive Bytes</td>(.+?)</tr>', re.DOTALL)
     recvBlock = p.search(tblContents).group(1)
 
+    elements = ['Transmit Speed', 
+                'Transmit Bytes', 'Receive Bytes',
+                'Transmit Packets', 'Receive Packets',
+                'Transmit Unicast', 'Receive Unicast',
+                'Transmit Multicast', 'Receive Multicast',
+                'Transmit Dropped', 'Receive Dropped',
+                'Transmit Errors', 'Receive Errors']
+    
+    fptr = open("statistics.ini", 'w')
+    for ele in elements:
+        p = re.compile('%s</td>(.+?)</tr>' % ele, re.DOTALL)
+        values = p.search(tblContents).group(1)
+        p = re.compile('<td class="col2">(\d+)</td>', re.MULTILINE)
+        value = sum(map(lambda x : int(x), p.findall(values)))
+        fptr.write("%s=%i\n" % (ele, value))
+        print("%s = %s" % (ele, value))
+    fptr.close()
+	
     # Each of these has 4 results, separated by physical port on the modem
     # I don't care about the individuals, so just get the numbers and sum them up
     p = re.compile('<td class="col2">(\d+)</td>', re.MULTILINE)
