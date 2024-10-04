@@ -1,0 +1,208 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    - uuid: 36723b63f14f474797665aa415dfad15
+      template: 'BGW320 Fiber Modem'
+      name: 'BGW320 Fiber Modem'
+      groups:
+        - name: 'Templates/Network devices'
+      items:
+        - uuid: 30a42caef94642f4b25dc266b9804e3a
+          name: 'Network Statistics'
+          type: EXTERNAL
+          key: 'modemparamsall.sh[]'
+          delay: 2m
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+        - uuid: 21059cf1742c42d396cd3e37df833519
+          name: 'Network Receive BPS'
+          type: DEPENDENT
+          key: net.if.bps
+          delay: '0'
+          preprocessing:
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: net.if.bytes
+        - uuid: c3b119a9c1d74f1988060ea0c7216849
+          name: 'Network Receive Bytes'
+          type: DEPENDENT
+          key: net.if.bytes
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Receive Bytes=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+        - uuid: fa5c59fe2ada4cd1ba7d5aef5bbeeb28
+          name: 'Network Receive Dropped'
+          type: DEPENDENT
+          key: net.if.dropped
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Receive Dropped=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+        - uuid: 6abed6b04c664020a760d3cc2c3ee930
+          name: 'Network Receive Errors'
+          type: DEPENDENT
+          key: net.if.errors
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Receive Errors=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+        - uuid: 49bf07d17bb84e0b97525d79dc39ea97
+          name: 'Network Receive Multicast'
+          type: DEPENDENT
+          key: net.if.multicast
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Receive Multicast=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+        - uuid: 171f3e6219a649b3be103f4c827fb9a9
+          name: 'Network Receive Packets'
+          type: DEPENDENT
+          key: net.if.packets
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Receive Packets=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+        - uuid: f1424a8ca0904339b5a5af0661a7fad2
+          name: 'Network Receive Unicast'
+          type: DEPENDENT
+          key: net.if.unicast
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Receive Unicast=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+        - uuid: 09c035ae0f26498097c05d0c928d0e32
+          name: 'Network Transmit BPS'
+          type: DEPENDENT
+          key: net.of.bps
+          delay: '0'
+          preprocessing:
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: net.of.bytes
+        - uuid: 93c2a2174d0849fb99047155c025832c
+          name: 'Network Transmit Bytes'
+          type: DEPENDENT
+          key: net.of.bytes
+          delay: '0'
+          units: b
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Transmit Bytes=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+        - uuid: 00d6654588054c5e8fa90aebeba2b8af
+          name: 'Network Transmit Dropped'
+          type: DEPENDENT
+          key: net.of.dropped
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Transmit Dropped=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+        - uuid: 6198b13ef84a40c2b36b8ea5f2750073
+          name: 'Network Transmit Dropped Rate'
+          type: DEPENDENT
+          key: net.of.droprate
+          delay: '0'
+          preprocessing:
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: net.of.dropped
+          triggers:
+            - uuid: 8e1241345ee0448bbf6f612af4af104b
+              expression: 'last(/BGW320 Fiber Modem/net.of.droprate)>=1'
+              name: 'Network Dropping Packets'
+              priority: HIGH
+        - uuid: ec6675132a054af9aaf7c26b727f12df
+          name: 'Network Transmit Errors'
+          type: DEPENDENT
+          key: net.of.errors
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Transmit Errors=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+          triggers:
+            - uuid: 5ceba00883c74163a697bebdf8b6d6ca
+              expression: 'last(/BGW320 Fiber Modem/net.of.errors)>1'
+              name: 'Transmission Error'
+              priority: HIGH
+        - uuid: aaa3602cd5174843bed0bbb2e6f993ec
+          name: 'Network Transmit Multicast'
+          type: DEPENDENT
+          key: net.of.multicast
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Transmit Multicast=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+        - uuid: 20896d100cb94507913cbd6b6a061134
+          name: 'Network Transmit Packets'
+          type: DEPENDENT
+          key: net.of.packets
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Transmit Packets=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
+        - uuid: 26ab949a3bfb48bd9e8a666b6f105393
+          name: 'Network Transmit Unicast'
+          type: DEPENDENT
+          key: net.of.unicast
+          delay: '0'
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - 'Transmit Unicast=([\d]+)'
+                - \1
+          master_item:
+            key: 'modemparamsall.sh[]'
